@@ -1,4 +1,4 @@
-# PRG08-2025-2026
+# PRG08-2025-2026-agent
 
 ## Installeren
 - Clone de repository!
