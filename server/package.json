@@ -7,14 +7,16 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "node --env-file=.env chat.js",
+    "agent": "node --env-file=.env agent.js",
     "start": "node --watch --env-file=.env server.js"
   },
   "dependencies": {
-    "@langchain/core": "^1.1.42",
-    "@langchain/openai": "^1.4.5",
+    "@langchain/core": "^1.2.1",
+    "@langchain/langgraph": "^1.4.6",
+    "@langchain/openai": "^1.5.2",
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "langchain": "^1.5.1",
     "zod": "^4.4.1"
   }
 }

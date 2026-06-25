@@ -1,6 +1,9 @@
-import express from 'express'
+import express from "express"
 import cors from 'cors'
-import { getChatHistory, callAssistant } from './chat.js'
+import {
+    // getChatHistory,
+    callAgent
+} from "./agent.js"
 
 const app = express()
 
@@ -13,18 +16,18 @@ app.get("/", (req, res) => {
 app.listen(3000, () => console.log(`Serving on http://localhost:3000`))
 
 app.get('/api/test', async (req, res) => {
-    const response = await callAssistant("dln-01", "What is your function?")
+    const response = await callAgent("dln-01", "What is your function?")
     res.json(response)
 })
 
-app.post("/api/gethistory", (req, res) => {
-    const { userId } = req.body;
-    const response = getChatHistory(userId);
-    res.json(response);
-});
+// app.post("/api/gethistory", (req, res) => {
+//     const { userId } = req.body;
+//     const response = getChatHistory(userId);
+//     res.json(response);
+// });
 
 app.post('/api/chat', async(req, res) => {
     const { userId, message } = req.body
-    const response = await callAssistant(userId, message)
+    const response = await callAgent(userId, message)
     res.json(response)
 })
