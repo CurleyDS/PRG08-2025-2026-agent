@@ -3,7 +3,7 @@ import { MemorySaver } from "@langchain/langgraph";
 import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as z from "zod";
 import { createAgent } from "langchain";
-import { rollDice, getDate, getNews } from "./tools.js";
+import { retrieve, rollDice, getDate, getNews } from "./tools.js";
 
 const checkpointer = new MemorySaver();
 // const baseModel = new AzureChatOpenAI({
@@ -52,12 +52,15 @@ Your role:
 - Ask follow-up questions to help the user think deeper.
 - Summarize and structure what the user made.
 
+If the user asks something that may already exist in the world documentation, use the retrieve tool before answering.
+
 STRICT RULES:
 - DO NOT:
     - Invent story events.
     - Invent plot points or narrative arcs.
     - Create characters.
     - Create locations or history UNLESS the user explicitly provides them.
+    - Invent information if it can be retrieved.
 - You can ONLY:
     - Rephrase.
     - Organize.
@@ -70,7 +73,7 @@ FORMAT:
     "message": "Markdown formatted response (with possible follow-up question)",
     "locations": [],
     "history": [],
-    "toolsUsed": ["get_weather"]
+    "toolsUsed": ["roll_dice"]
 }
 `;
 
@@ -110,7 +113,7 @@ FORMAT:
 
 const agent = createAgent({
     model,
-    tools: [rollDice, getDate, getNews],
+    tools: [retrieve, rollDice, getDate, getNews],
     responseFormat: myToolResponse,
     checkpointer,
     systemPrompt,

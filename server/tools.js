@@ -1,4 +1,34 @@
+import { AzureOpenAIEmbeddings } from "@langchain/openai";
+import { FaissStore } from "@langchain/community/vectorstores/faiss";
+
 import { tool } from "langchain";
+
+const embeddings = new AzureOpenAIEmbeddings({
+    temperature: 0,
+    azureOpenAIApiEmbeddingsDeploymentName: process.env.AZURE_EMBEDDING_DEPLOYMENT_NAME
+});
+
+const vectorStore = await FaissStore.load("./documents", embeddings);
+console.log("✅ vector store loaded!")
+
+export const retrieve = tool(
+    async ({ query }) => {
+        console.log("🔧 now searching the document store");
+        const relevantDocs = await vectorStore.similaritySearch(query, 2);
+        const context = relevantDocs.map(doc => doc.pageContent).join("\n\n");
+        return context;
+    },
+    {
+        name: "retrieve",
+        description: "Searches the world lore documents.",
+        schema: {
+            type: "object",
+            properties: { query: { type: "string" } },
+            required: ["query"],
+            additionalProperties: false
+        }
+    }
+);
 
 export const rollDice = tool(
     ({ sides }) => {
