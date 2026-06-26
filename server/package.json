@@ -8,15 +8,20 @@
   "main": "index.js",
   "scripts": {
     "agent": "node --env-file=.env agent.js",
-    "start": "node --watch --env-file=.env server.js"
+    "start": "node --watch --env-file=.env server.js",
+    "create": "node --env-file=.env ./create.js"
   },
   "dependencies": {
+    "@langchain/classic": "^1.0.38",
+    "@langchain/community": "^1.1.29",
     "@langchain/core": "^1.2.1",
     "@langchain/langgraph": "^1.4.6",
-    "@langchain/openai": "^1.5.2",
+    "@langchain/openai": "^1.5.3",
+    "@langchain/textsplitters": "^1.0.1",
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "langchain": "^1.5.1",
+    "faiss-node": "^0.5.1",
+    "langchain": "^1.5.2",
     "zod": "^4.4.1"
   }
 }

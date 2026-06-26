@@ -44,34 +44,6 @@ export const getDate = tool(
     },
 )
 
-export const getWeather = tool(
-    async ({ city }) => {
-        console.log(`🔧 De weather tool wordt uitgevoerd!`)
-        const apiKey = process.env.MY_WEATHER_KEY;
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
-        const response = await fetch(url);
-        const data = await response.json();
-        console.log(data);
-        if (data.weather) {
-            return `Het is ${data.weather[0].description} en ${data.main.temp}°C in ${city}.`;
-        }
-        
-        return `Sorry, ik kon het weer voor ${city} niet ophalen.`;
-    },
-    {
-        name: "get_weather",
-        description: "Get the weather for a given city",
-        schema: {
-            type: "object",
-            properties: {
-                city: { type: "string" },
-            },
-            required: ["city"],
-            additionalProperties: false
-        },
-    },
-);
-
 export const getNews = tool(
     async ({ query }) => {
         console.log(`🔧 Het nieuws wordt opgehaald!`)

@@ -3,7 +3,7 @@ import { MemorySaver } from "@langchain/langgraph";
 import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as z from "zod";
 import { createAgent } from "langchain";
-import { getWeather, rollDice, getDate, getNews } from "./tools.js";
+import { rollDice, getDate, getNews } from "./tools.js";
 
 const checkpointer = new MemorySaver();
 // const baseModel = new AzureChatOpenAI({
@@ -110,7 +110,7 @@ FORMAT:
 
 const agent = createAgent({
     model,
-    tools: [getWeather, rollDice, getDate, getNews],
+    tools: [rollDice, getDate, getNews],
     responseFormat: myToolResponse,
     checkpointer,
     systemPrompt,
@@ -135,7 +135,10 @@ const agent = createAgent({
 // }
 
 export async function callAgent(userId, prompt) {
-    const result = await agent.invoke({ messages: [{ role: "user", content: prompt }] }, { configurable: {thread_id: userId} });
+    const result = await agent.invoke(
+        { messages: [{ role: "user", content: prompt }] },
+        { configurable: {thread_id: userId} }
+    );
 
     console.log(result);
 
