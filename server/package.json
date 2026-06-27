@@ -22,6 +22,7 @@
     "express": "^5.2.1",
     "faiss-node": "^0.5.1",
     "langchain": "^1.5.2",
+    "pdf-parse": "^2.4.5",
     "zod": "^4.4.1"
   }
 }

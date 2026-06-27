@@ -1,4 +1,4 @@
-import { TextLoader } from "@langchain/classic/document_loaders/fs/text";
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 
 import { AzureOpenAIEmbeddings } from "@langchain/openai";
@@ -10,8 +10,16 @@ const embeddings = new AzureOpenAIEmbeddings({
 });
 
 // laad tekstbestand
-const loader = new TextLoader("./public/worldlore.txt");
-const docs = await loader.load();
+const guide1Loader = new PDFLoader("./public/Building_Worlds_Document_Blauw_Films.pdf");
+const guide2Loader = new PDFLoader("./public/The_KOBOLD_Guide_to_Worldbuilding.pdf");
+
+const guide1Docs = await guide1Loader.load();
+const guide2Docs = await guide2Loader.load();
+
+const docs = [
+    ...guide1Docs,
+    ...guide2Docs
+];
 
 // opsplitsen
 const splitter = new RecursiveCharacterTextSplitter({

@@ -24,7 +24,15 @@ function App() {
 
         setMessages([
             {
-                text: `## Hey, I'm Relmy!\nI help with world-building.`,
+                text: `
+## Hey, I'm Relmy!
+I help with world-building.
+
+If you need help from guides, I have access to the following documents:
+
+* Building Worlds by Blauw Films
+* The KOBOLD Guide to Worldbuilding
+`,
                 sender: "bot"
             }
         ]);
@@ -114,7 +122,7 @@ function App() {
                         ) + " p-3 rounded-lg"}
                     >
                       <div
-                          className="text-white"
+                          className="text-white [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:my-4 [&>li]:mb-1"
                           dangerouslySetInnerHTML={{
                               __html: DOMPurify.sanitize(micromark(msg.text))
                           }}
