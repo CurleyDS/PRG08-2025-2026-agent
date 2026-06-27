@@ -6,7 +6,10 @@ function App() {
     const [userId, setUserId] = useState("");
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState("");
-    const [world, setWorld] = useState({})
+    const [world, setWorld] = useState({
+        locations: [],
+        history: [],
+    });
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -15,31 +18,9 @@ function App() {
         if (!storedUserId) {
             storedUserId = crypto.randomUUID();
             localStorage.setItem("userid", storedUserId);
-        }
+        };
 
         setUserId(storedUserId);
-
-        // fetch("http://localhost:3000/api/gethistory", {
-        //     method: "POST",
-        //     headers: {
-        //         "Content-Type": "application/json"
-        //     },
-        //     body: JSON.stringify({ userId: storedUserId })
-        // })
-        // .then(response => response.json())
-        // .then(data => {
-        //     console.log(data);
-        //     if (data.length > 0) {
-        //         setMessages(data);
-        //     } else {
-        //         setMessages([
-        //             {
-        //                 text: `## Hey, I'm Relmy!\nI help with world-building.`,
-        //                 sender: "bot"
-        //             }
-        //         ]);
-        //     }
-        // });
 
         setMessages([
             {
@@ -47,11 +28,6 @@ function App() {
                 sender: "bot"
             }
         ]);
-        
-        setWorld({
-            locations: [],
-            history: []
-        });
     }, []);
 
     const changeMessage = (e) => {
@@ -92,17 +68,29 @@ function App() {
                 updated[updated.length - 1] = {
                     text: data.message,
                     sender: "bot",
-                    tokens: data.tokens
+                    tokens: data.tokens,
+                    toolsUsed: data.toolsUsed
                 };
                 return updated;
             });
 
             setWorld({
-                locations: data.locations,
-                history: data.history,
+                locations: data.locations ?? [],
+                history: data.history ?? [],
             });
         } catch (err) {
             console.error(err);
+
+            setMessages(prev => {
+                const updated = [...prev];
+
+                updated[updated.length - 1] = {
+                    text: "Something went wrong.",
+                    sender: "bot",
+                };
+
+                return updated;
+            });
         }
 
         setMessage("");
@@ -131,14 +119,37 @@ function App() {
                               __html: DOMPurify.sanitize(micromark(msg.text))
                           }}
                       />
-                      {msg.tokens && <p className={(msg.sender === "user" ? "text-left": "text-right") + " text-sm"}>Tokens: {msg.tokens}</p>}
+
+                      {msg.tokens && (
+                        <p
+                            className={(
+                                msg.sender === "user"
+                                ? "text-left"
+                                : "text-right"
+                            ) + " text-sm"}
+                        >
+                            Tokens: {msg.tokens}
+                        </p>
+                      )}
+
+                      {msg.toolsUsed && msg.toolsUsed.length > 0 && (
+                        <p
+                            className={(
+                                msg.sender === "user"
+                                ? "text-left"
+                                : "text-right"
+                            ) + " text-sm"}
+                        >
+                            Tools: {msg.toolsUsed.join(", ")}
+                        </p>
+                      )}
                     </div>
                 ))}
             </div>
 
             {/* Chat-message */}
             <div className="flex p-4">
-                <input type="text" className="flex-1 p-2 border rounded" placeholder="Type something..." value={message} onChange={changeMessage}/>
+                <input type="text" className="flex-1 p-2 border rounded" placeholder="Type something..." value={message} onChange={changeMessage} onKeyDown={(e) => { if (e.key === "Enter" && !loading) { sendMessage(); } }}/>
                 <button className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50 ml-2" onClick={sendMessage} disabled={loading}>SEND</button>
             </div>
             
@@ -146,27 +157,23 @@ function App() {
             <h1 className="p-4 font-bold text-2xl">World</h1>
 
             <div className="p-4 text-left">
-                {world.locations && (
-                    <div>
-                        <p>Locations:</p>
-                        <ul className="list-disc p-4 ">
-                            {world.locations.map((loc, index) => (
-                                <li key={index}>{loc}</li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-
-                {world.history && (
-                    <div>
-                        <p>History:</p>
-                        <ul className="list-disc p-4 ">
-                            {world.history.map((event, index) => (
-                                <li key={index}>{event}</li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
+                <div>
+                    <p>Locations:</p>
+                    <ul className="list-disc p-4 ">
+                        {world.locations.map((loc, index) => (
+                            <li key={index}>{loc}</li>
+                        ))}
+                    </ul>
+                </div>
+                
+                <div>
+                    <p>History:</p>
+                    <ul className="list-disc p-4 ">
+                        {world.history.map((event, index) => (
+                            <li key={index}>{event}</li>
+                        ))}
+                    </ul>
+                </div>
             </div>
         </div>
     );

@@ -1,17 +1,17 @@
-import { AzureChatOpenAI } from "@langchain/openai"
-import { MemorySaver } from "@langchain/langgraph";
-import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
-import * as z from "zod";
+import { AzureChatOpenAI } from "@langchain/openai";
 import { createAgent } from "langchain";
+import { MemorySaver } from "@langchain/langgraph";
+import * as z from "zod";
 import { retrieve, rollDice, getDate, getNews } from "./tools.js";
 
 const checkpointer = new MemorySaver();
-// const baseModel = new AzureChatOpenAI({
-//     model: "gpt-4.1",
-//     temperature: 0.2,
-//     maxTokens: undefined,
-//     maxRetries: 2,
-// });
+
+const model = new AzureChatOpenAI({
+    model: "gpt-4.1",
+    temperature: 0.2,
+    maxTokens: undefined,
+    maxRetries: 2,
+});
 
 const myToolResponse = z.object({
     message: z.string().describe("Markdown formatted assistant response (with possible follow-up question)"),
@@ -22,22 +22,6 @@ const myToolResponse = z.object({
 
     toolsUsed: z.array(z.string())
 });
-
-// const model = baseModel.withStructuredOutput(
-//     Builder,
-//     {
-//         includeRaw: true
-//     }
-// );
-
-const model = new AzureChatOpenAI({
-    model: "gpt-4.1",
-    temperature: 0.2,
-    maxTokens: undefined,
-    maxRetries: 2,
-});
-
-// const userChats = new Map();
 
 const systemPrompt = `
 You are Relmy! A friendly world-building-assistant.
@@ -53,6 +37,8 @@ Your role:
 - Summarize and structure what the user made.
 
 If the user asks something that may already exist in the world documentation, use the retrieve tool before answering.
+
+If a location or history event is mentioned that helps keep track of a source of information, ALWAYS ask if the location should be added or not in the reply.
 
 STRICT RULES:
 - DO NOT:
@@ -77,40 +63,6 @@ FORMAT:
 }
 `;
 
-// (OLD) Kijk of er al een chat history is voor die user, zo niet maak er eentje
-// function getUserChat(userId) {
-//     if (!userChats.has(userId)) {
-//         userChats.set(userId, [new SystemMessage(systemPrompt)]);
-//     }
-//     return userChats.get(userId);
-// }
-
-// export function getChatHistory(userId) {
-//     const messages = getUserChat(userId);
-
-//     // Format de chat history van de gebruiker
-//     const formatted = messages.filter(msg => msg.content).map(msg => ({
-//         text: msg.content,
-//         sender:
-//             msg._getType() === "human"
-//             ? "user"
-//             : msg._getType() === "ai"
-//                 ? "bot"
-//                 : "system"
-//     }));
-    
-//     // Verander het 'systemPrompt' naar een introductie-bericht
-//     formatted[0] = {
-//         text: `## Hey, I'm Relmy!\nI help with world-building.`,
-//         sender: "bot"
-//     };
-
-//     // Check chat history
-//     console.log(`User ${userId}:`, messages);
-
-//     return formatted;
-// }
-
 const agent = createAgent({
     model,
     tools: [retrieve, rollDice, getDate, getNews],
@@ -119,25 +71,7 @@ const agent = createAgent({
     systemPrompt,
 });
 
-// export async function callAgent(userId, prompt) {
-//     const messages = getUserChat(userId);
-
-//     // De vraag van de gebruiker toevoegen aan de chat history
-//     messages.push(new HumanMessage(prompt));
-
-//     // AI antwoord ophalen en toevoegen aan chat history
-//     const result = await agent.invoke(messages);
-//     messages.push(new AIMessage(result.parsed.message));
-
-//     // Check chat history
-//     console.log(`User ${userId}:`, messages);
-
-//     result.parsed.tokens = result.raw.usage_metadata.total_tokens;
-
-//     return result.parsed;
-// }
-
-export async function callAgent(userId, prompt) {
+export async function callOpenAI(userId, prompt) {
     const result = await agent.invoke(
         { messages: [{ role: "user", content: prompt }] },
         { configurable: {thread_id: userId} }
@@ -146,4 +80,4 @@ export async function callAgent(userId, prompt) {
     console.log(result);
 
     return result.structuredResponse;
-}
+};

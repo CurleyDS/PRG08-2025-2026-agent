@@ -9,11 +9,11 @@ const embeddings = new AzureOpenAIEmbeddings({
 });
 
 const vectorStore = await FaissStore.load("./documents", embeddings);
-console.log("✅ vector store loaded!")
+console.log("✅ vector store loaded!");
 
 export const retrieve = tool(
     async ({ query }) => {
-        console.log("🔧 now searching the document store");
+        console.log("🔧 Now searching the document store!");
         const relevantDocs = await vectorStore.similaritySearch(query, 2);
         const context = relevantDocs.map(doc => doc.pageContent).join("\n\n");
         return context;
@@ -32,8 +32,8 @@ export const retrieve = tool(
 
 export const rollDice = tool(
     ({ sides }) => {
-        console.log(`🔧  Ik rol een ${sides}-sided dobbelsteen!`)
-        const result = Math.floor(Math.random() * sides) +1
+        console.log(`🔧 I roll a ${sides}-sided die!`);
+        const result = Math.floor(Math.random() * sides) + 1;
         return `Ik gooide een ${result}`;
     },
     {
@@ -46,12 +46,13 @@ export const rollDice = tool(
             },
             required: ["sides"],
             additionalProperties: false
-        },
-    },
-)
+        }
+    }
+);
 
 export const getDate = tool(
     () => {
+        console.log(`🔧 Getting the date!`);
         const today = new Date();
         const readableDate = today.toLocaleDateString("nl-NL", {
             weekday: "long",
@@ -59,7 +60,6 @@ export const getDate = tool(
             month: "long",
             day: "numeric",
         });
-        console.log(readableDate)
         return readableDate;
     },
     {
@@ -70,9 +70,9 @@ export const getDate = tool(
             properties: {},
             required: [],
             additionalProperties: false
-        },
-    },
-)
+        }
+    }
+);
 
 export const getNews = tool(
     async ({ query }) => {
@@ -85,18 +85,12 @@ export const getNews = tool(
             },
             body: JSON.stringify({
                 query: query,
-                search_depth: "basic",         // or "advanced" for deeper results
-                include_answer: true,          // Tavily summarizes the results for you
+                search_depth: "basic",  // "advanced" for deeper results
+                include_answer: true,   // Tavily summarizes the results
             }),
         });
-
         const data = await res.json();
         return data;
-        // if (data.weather) {
-        //     return `Het is ${data.weather[0].description} en ${data.main.temp}°C in ${city}.`;
-        // }
-
-        // return `Sorry, ik kon het weer voor ${city} niet ophalen.`;
     },
     {
         name: "get_news",
