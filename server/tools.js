@@ -8,9 +8,11 @@ const embeddings = new AzureOpenAIEmbeddings({
     azureOpenAIApiEmbeddingsDeploymentName: process.env.AZURE_EMBEDDING_DEPLOYMENT_NAME
 });
 
+// load documents from vectorStore
 const vectorStore = await FaissStore.load("./documents", embeddings);
 console.log("✅ vector store loaded!");
 
+// retrieve documents
 export const retrieve = tool(
     async ({ query }) => {
         console.log("🔧 Now searching the document store!");
@@ -30,6 +32,7 @@ export const retrieve = tool(
     }
 );
 
+// rolls dice
 export const rollDice = tool(
     ({ sides }) => {
         console.log(`🔧 I roll a ${sides}-sided die!`);
@@ -50,6 +53,7 @@ export const rollDice = tool(
     }
 );
 
+// get date
 export const getDate = tool(
     () => {
         console.log(`🔧 Getting the date!`);
@@ -74,6 +78,7 @@ export const getDate = tool(
     }
 );
 
+// get news
 export const getNews = tool(
     async ({ query }) => {
         console.log(`🔧 Het nieuws wordt opgehaald!`)

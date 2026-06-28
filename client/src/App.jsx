@@ -38,10 +38,12 @@ If you need help from guides, I have access to the following documents:
         ]);
     }, []);
 
+    // update Message
     const changeMessage = (e) => {
         setMessage(e.target.value);
     };
 
+    // send Message-prompt
     const sendMessage = async () => {
         setLoading(true);
 
@@ -59,6 +61,7 @@ If you need help from guides, I have access to the following documents:
         setMessages(newMessages);
 
         try {
+            // fetch POST-request to call OpenAI
             const response = await fetch("http://localhost:3000/api/chat", {
                 method: "POST",
                 headers: {
@@ -71,6 +74,7 @@ If you need help from guides, I have access to the following documents:
             
             console.log(data);
 
+            // set Messages
             setMessages(prev => {
                 const updated = [...prev];
                 updated[updated.length - 1] = {
@@ -82,11 +86,13 @@ If you need help from guides, I have access to the following documents:
                 return updated;
             });
 
+            // set World
             setWorld({
                 locations: data.locations ?? [],
                 history: data.history ?? [],
             });
         } catch (err) {
+            // error-handling
             console.error(err);
 
             setMessages(prev => {

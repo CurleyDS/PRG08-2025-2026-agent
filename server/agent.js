@@ -68,6 +68,7 @@ export async function callOpenAI(userId, prompt) {
 
     console.log(result);
 
+    // return response and total-tokens used
     return {
         ...result.structuredResponse,
         tokens: result.messages.at(-1)?.usage_metadata?.total_tokens ?? 0
